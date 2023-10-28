@@ -38,9 +38,9 @@ contract Punish is Params {
 
     function initialize() external onlyNotInitialized {
         validators = Validators(ValidatorContractAddr);
-        punishThreshold = 24;
-        removeThreshold = 48;
-        decreaseRate = 24;
+        punishThreshold = 55200;
+        removeThreshold = 56400;
+        decreaseRate = 55200;
 
         initialized = true;
     }

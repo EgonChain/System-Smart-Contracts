@@ -34,7 +34,7 @@ contract Validators is Params {
         Description description;
         uint256 hbIncoming;
         uint256 totalJailedHB;
-        uint256 lastWithdrawProfitsBlock;
+      //  uint256 lastWithdrawProfitsBlock;
         // Address list of user who has staked for this validator
         address[] stakers;
     }
@@ -60,8 +60,10 @@ contract Validators is Params {
     uint256 public totalStake;
     // total jailed hb
     uint256 public totalJailedHB;
-    mapping(address => address) public contractCreator;
 
+    
+
+    mapping(address => address) public contractCreator;
 
     // staker => validator => lastRewardTime
     mapping(address => mapping(address => uint)) public stakeTime;
@@ -149,9 +151,10 @@ contract Validators is Params {
         _;
     }
 
+
     // This contract share of validator gain to creator of contract
     // It is advised to call this function your contract constructor to avoid intruders
-    function setContractCreator(address _contract ) private returns(bool)
+    function setContractCreator(address _contract ) public returns(bool)
     {
         require(contractCreator[_contract] == address(0), "invalid call");
         contractCreator[_contract] = tx.origin;
@@ -190,12 +193,12 @@ contract Validators is Params {
         onlyInitialized
         returns (bool)
     {
-        address payable staker = payable(msg.sender);
+        address payable staker = payable(tx.origin);
         uint256 staking = msg.value;
 
         require(
-            (validatorInfo[validator].status == Status.Created ||
-                validatorInfo[validator].status == Status.Staked) && validatorInfo[msg.sender].status != Status.NotExist,
+            validatorInfo[validator].status == Status.Created ||
+                validatorInfo[validator].status == Status.Staked,
             "Can't stake to a validator in abnormal status"
         );
 
@@ -206,11 +209,17 @@ contract Validators is Params {
 
         Validator storage valInfo = validatorInfo[validator];
         // The staked coins of validator must >= MinimalStakingCoin
-        require(
-            valInfo.coins + (staking) >= MinimalStakingCoin,
-            "Staking coins not enough"
-        );
-
+        if(staker == validator){
+            require(
+                valInfo.coins + (staking) >= MinimalStakingCoin,
+                "Staking coins not enough"
+            );
+        }
+        else
+        {
+            require(staking >= MinimalStakingCoin,
+            "Staking coins not enough");
+        }
         // stake at first time to this valiadtor
         if (staked[staker][validator].coins == 0) {
             // add staker to validator's record list
@@ -256,16 +265,16 @@ contract Validators is Params {
             validateDescription(moniker, identity, website, email, details),
             "Invalid description"
         );
-        address payable validator = payable(msg.sender);
+        address payable validator = payable(tx.origin);
         bool isCreate = false;
         if (validatorInfo[validator].status == Status.NotExist) {
             validatorInfo[validator].status = Status.Created;
             isCreate = true;
         }
-        else  if(msg.value > 0)
+        else  if(msg.value > 0)             
         {
-            //require(msg.value == 0, "Cannot restake from here");
-             return false;
+            //require(msg.value == 0, "Cannot restake from here");           
+             return false;            
         }
 
         if (validatorInfo[validator].feeAddr != feeAddr) {
@@ -308,7 +317,7 @@ contract Validators is Params {
         if (validatorInfo[validator].status == Status.Jailed) {
             require(punish.cleanPunishRecord(validator), "clean failed");
         }
-        validatorInfo[validator].status = Status.Created;
+        validatorInfo[validator].status = Status.Staked;
 
         emit LogReactive(validator, block.timestamp);
 
@@ -320,7 +329,7 @@ contract Validators is Params {
         onlyInitialized
         returns (bool)
     {
-        address staker = msg.sender;
+        address staker = tx.origin;
         require(
             validatorInfo[validator].status != Status.NotExist,
             "Validator not exist"
@@ -376,22 +385,22 @@ contract Validators is Params {
 
     function withdrawStakingReward(address validator) public returns(bool)
     {
-        require(stakeTime[msg.sender][validator] > 0 , "nothing staked");
-        //require(stakeTime[msg.sender][validator] < lastRewardTime[validator], "no reward yet");
-        StakingInfo storage stakingInfo = staked[msg.sender][validator];
-        uint validPercent = reflectionPercentSum[validator][lastRewardTime[validator]] - reflectionPercentSum[validator][stakeTime[msg.sender][validator]];
+        require(stakeTime[tx.origin][validator] > 0 , "nothing staked");
+        //require(stakeTime[tx.origin][validator] < lastRewardTime[validator], "no reward yet");
+        StakingInfo storage stakingInfo = staked[tx.origin][validator];
+        uint validPercent = reflectionPercentSum[validator][lastRewardTime[validator]] - reflectionPercentSum[validator][stakeTime[tx.origin][validator]];
         if(validPercent > 0)
         {
-            stakeTime[msg.sender][validator] = lastRewardTime[validator];
+            stakeTime[tx.origin][validator] = lastRewardTime[validator];
             uint reward = stakingInfo.coins * validPercent / 100000000000000000000  ;
-            payable(msg.sender).transfer(reward);
-            emit withdrawStakingRewardEv(msg.sender, validator, reward, block.timestamp);
+            payable(tx.origin).transfer(reward);
+            emit withdrawStakingRewardEv(tx.origin, validator, reward, block.timestamp);
         }
         return true;
     }
 
     function withdrawStaking(address validator) external returns (bool) {
-        address payable staker = payable(msg.sender);
+        address payable staker = payable(tx.origin);
         StakingInfo storage stakingInfo = staked[staker][validator];
         require(
             validatorInfo[validator].status != Status.NotExist,
@@ -418,7 +427,7 @@ contract Validators is Params {
 
     // feeAddr can withdraw profits of it's validator
     function withdrawProfits(address validator) external returns (bool) {
-        address payable feeAddr = payable(msg.sender);
+        address payable feeAddr = payable(tx.origin);
         require(
             validatorInfo[validator].status != Status.NotExist,
             "Validator not exist"
@@ -427,24 +436,24 @@ contract Validators is Params {
             validatorInfo[validator].feeAddr == feeAddr,
             "You are not the fee receiver of this validator"
         );
-        require(
+        /*require(
             validatorInfo[validator].lastWithdrawProfitsBlock +
                 WithdrawProfitPeriod <=
                 block.number,
             "You must wait enough blocks to withdraw your profits after latest withdraw of this validator"
-        );
+        );*/
         uint256 hbIncoming = validatorInfo[validator].hbIncoming;
         require(hbIncoming > 0, "You don't have any profits");
 
         // update info
         validatorInfo[validator].hbIncoming = 0;
-        validatorInfo[validator].lastWithdrawProfitsBlock = block.number;
+       // validatorInfo[validator].lastWithdrawProfitsBlock = block.number;
 
         // send profits to fee address
         if (hbIncoming > 0) {
             feeAddr.transfer(hbIncoming);
         }
-
+        withdrawStakingReward(validator);
         emit LogWithdrawProfits(
             validator,
             feeAddr,
@@ -465,36 +474,39 @@ contract Validators is Params {
         onlyInitialized
     {
         operationsDone[block.number][uint8(Operations.Distribute)] = true;
-        address val = msg.sender;
+        address val = tx.origin;
         uint256 reward = msg.value;
         uint256 remaining = reward;
-
+        
         //to validator
         uint _validatorPart = reward * validatorPartPercent / 100000;
         remaining = remaining - _validatorPart;
 
-        //to burn
+        //to burn 
         uint _burnPart = reward * burnPartPercent / 100000;
-        if(totalBurnt + _burnPart <= burnStopAmount )
+        if(totalBurnt + _burnPart <= burnStopAmount ) 
         {
             remaining = remaining - _burnPart;
             totalBurnt += _burnPart;
             if(_burnPart > 0) payable(address(0)).transfer(_burnPart);
-        }
+        } 
+
 
         // to contract
         //uint _contractPart = reward * contractPartPercent / 100000;
-        for (uint i=0; i<_to.length; i++)
-        {
-            if(_to[i] != address(0) && contractCreator[_to[i]] != address(0))
-            {
-                uint amt = uint256(_gass[i]);
-                amt = amt * contractPartPercent / 100000;
-                payable(contractCreator[_to[i]]).transfer(amt);
-                remaining = remaining - amt;
+        if(_to.length > 0){
+          uint256 _contractPart = reward * contractPartPercent / 100000;
+          remaining = remaining - _contractPart;
+          uint256 amt  = _contractPart / _to.length;
+          if(amt > 0){
+            for (uint i=0; i<_to.length; i++)        {
+                if(_to[i] != address(0) && contractCreator[_to[i]] != address(0) && _gass[i]>0)
+                {
+                    payable(contractCreator[_to[i]]).transfer(amt);
+                }
             }
-
-        }
+          }
+      }
 
         uint lastRewardHold = reflectionPercentSum[val][lastRewardTime[val]];
         lastRewardTime[val] = block.timestamp;
@@ -582,7 +594,7 @@ contract Validators is Params {
             uint256,
             uint256,
             uint256,
-            uint256,
+            //uint256,
             address[] memory
         )
     {
@@ -594,7 +606,7 @@ contract Validators is Params {
             v.coins,
             v.hbIncoming,
             v.totalJailedHB,
-            v.lastWithdrawProfitsBlock,
+          //  v.lastWithdrawProfitsBlock,
             v.stakers
         );
     }
@@ -776,7 +788,6 @@ contract Validators is Params {
         if (totalRewardStake == 0) {
             uint256 per = totalReward / (rewardValsLen);
             remain = totalReward - (per * rewardValsLen);
-
             for (uint256 i = 0; i < currentValidatorSet.length; i++) {
                 address val = currentValidatorSet[i];
                 if (
@@ -858,15 +869,15 @@ contract Validators is Params {
             }
         }
     }
-
+    
     function viewStakeReward(address _staker, address _validator) public view returns(uint256){
-
-        uint validPercent = reflectionPercentSum[_validator][lastRewardTime[_validator]] - reflectionPercentSum[_validator][stakeTime[_staker][_validator]];
-        if(validPercent > 0)
-        {
-            StakingInfo memory stakingInfo = staked[_staker][_validator];
-            return stakingInfo.coins * validPercent / 100000000000000000000  ;
-
+        if(stakeTime[_staker][_validator] > 0){
+            uint validPercent = reflectionPercentSum[_validator][lastRewardTime[_validator]] - reflectionPercentSum[_validator][stakeTime[_staker][_validator]];
+            if(validPercent > 0)
+            {
+                StakingInfo memory stakingInfo = staked[_staker][_validator];
+                return stakingInfo.coins * validPercent / 100000000000000000000  ;
+            }
         }
         return 0;
     }

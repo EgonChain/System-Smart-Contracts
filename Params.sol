@@ -16,19 +16,17 @@ contract Params {
     uint16 public constant MaxValidators = 51;
     // Validator have to wait StakingLockPeriod blocks to withdraw staking
     uint64 public constant StakingLockPeriod = 86400;
-    // Validator have to wait WithdrawProfitPeriod blocks to withdraw his profits
-    uint64 public constant WithdrawProfitPeriod = 28800;
-    uint256 public constant MinimalStakingCoin = 0 ether;
+    uint256 public constant MinimalStakingCoin = 32 ether;
     // minimum initial staking to become a validator
     uint256 public constant minimumValidatorStaking = 50000 ether;
 
 
     // percent distrubution of Gas Fee earned by validator 100000 = 100%
-    uint public constant stakerPartPercent = 0;          //0% 
-    uint public constant validatorPartPercent = 95000;        //60%
-    uint public constant burnPartPercent = 5000;                //5%
-    uint public constant contractPartPercent = 0;        //50%
-    uint public constant burnStopAmount = 10000000 ether;      // after 10,000,000 coins burn, it will stop burning
+    uint public constant stakerPartPercent = 0;             //0% 
+    uint public constant validatorPartPercent = 95000;      //95%
+    uint public constant burnPartPercent = 5000;            //5%
+    uint public constant contractPartPercent = 0;           //0%
+    uint public constant burnStopAmount = 10000000 ether;   // after 10,000,000 coins burn, it will stop burning
     uint public totalBurnt;
 
 

@@ -18,7 +18,7 @@ contract Params {
     uint64 public constant StakingLockPeriod = 86400;
     uint256 public constant MinimalStakingCoin = 32 ether;
     // minimum initial staking to become a validator
-    uint256 public constant minimumValidatorStaking = 50000 ether;
+    uint256 public constant minimumValidatorStaking = 7000 ether;   //7000
 
 
     // percent distrubution of Gas Fee earned by validator 100000 = 100%

@@ -1,0 +1,333 @@
+{
+	"compiler": {
+		"version": "0.8.19+commit.7dd6d404"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "user",
+						"type": "address"
+					}
+				],
+				"name": "checkValidator",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getAllValidatorInfo",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "totalValidatorCount",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "totalStakedCoins",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address[]",
+						"name": "",
+						"type": "address[]"
+					},
+					{
+						"internalType": "enum InterfaceValidator.Status[]",
+						"name": "",
+						"type": "uint8[]"
+					},
+					{
+						"internalType": "uint256[]",
+						"name": "",
+						"type": "uint256[]"
+					},
+					{
+						"internalType": "string[]",
+						"name": "",
+						"type": "string[]"
+					},
+					{
+						"internalType": "string[]",
+						"name": "",
+						"type": "string[]"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "minimumStakingAmount",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "user",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "validatorAddress",
+						"type": "address"
+					}
+				],
+				"name": "stakingValidations",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "minimumStakingAmt",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "stakingWaiting",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "valContract",
+				"outputs": [
+					{
+						"internalType": "contract InterfaceValidator",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "validatorAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "user",
+						"type": "address"
+					}
+				],
+				"name": "validatorSpecificInfo1",
+				"outputs": [
+					{
+						"internalType": "string",
+						"name": "identityName",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "website",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "otherDetails",
+						"type": "string"
+					},
+					{
+						"internalType": "uint256",
+						"name": "withdrawableRewards",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "stakedCoins",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "waitingBlocksForUnstake",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "validatorAddress",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "user",
+						"type": "address"
+					}
+				],
+				"name": "validatorSpecificInfo2",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "totalStakedCoins",
+						"type": "uint256"
+					},
+					{
+						"internalType": "enum InterfaceValidator.Status",
+						"name": "status",
+						"type": "uint8"
+					},
+					{
+						"internalType": "uint256",
+						"name": "selfStakedCoins",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "masterVoters",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "stakers",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "user",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "validator",
+						"type": "address"
+					}
+				],
+				"name": "waitingUnstaking",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "user",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "validatorAddress",
+						"type": "address"
+					}
+				],
+				"name": "waitingWithdrawProfit",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "user",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "validatorAddress",
+						"type": "address"
+					}
+				],
+				"name": "waitingWithdrawStaking",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"ValidatorView.sol": "ValidatorData"
+		},
+		"evmVersion": "paris",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": true,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"ValidatorView.sol": {
+			"keccak256": "0x003319c1ae2b27e2d86f996f691f9be6cf2c2c3cb771b070bd1405d98264f62c",
+			"license": "GPL-3.0",
+			"urls": [
+				"bzz-raw://238cc4a5a8b39d4c88e40351e26c854f7fa3817547136f10ea3945c4d9a3fb31",
+				"dweb:/ipfs/QmcHTJrF8RQcnFhgtmKhTwfQjUzAYmu83U6YRzsM1p1mmW"
+			]
+		}
+	},
+	"version": 1
+}

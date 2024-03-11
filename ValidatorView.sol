@@ -160,7 +160,7 @@ abstract contract Ownable is Context {
 contract ValidatorHelper is Ownable {
 
     InterfaceValidator public valContract = InterfaceValidator(0x000000000000000000000000000000000000f000);
-    uint256 public minimumValidatorStaking = 1000000 * 1e18;
+    uint256 public minimumValidatorStaking = 7000 * 1e18;
     uint256 public lastRewardedBlock ;
     uint256 public extraRewardsPerBlock = 1 * 1e18;
     uint256 public rewardFund;
@@ -212,20 +212,24 @@ contract ValidatorHelper is Ownable {
 
     function withdrawStakingReward(address validator) external {
         require(validator == tx.origin, "caller should be real validator");
+        (, , , uint256 hbincoming, , )  = valContract.getValidatorInfo(validator);
         uint256 blockRewards = viewValidatorRewards(validator);
-        require(blockRewards > 0, "Nothing to withdraw");
+        require(hbincoming + blockRewards > 0, "Nothing to withdraw");
 
         _distributeRewards();
-	valContract.withdrawProfits(validator);
+        if(hbincoming > 0){
+	        valContract.withdrawProfits(validator);
+        }
+        if(blockRewards > 0){
+            rewardFund -= blockRewards;
 
-        rewardFund -= blockRewards;
+            rewardBalance[validator] -= blockRewards;
+            totalProfitWithdrawn[validator] += blockRewards;
 
-        rewardBalance[validator] = 0;
-        totalProfitWithdrawn[validator] += blockRewards;
+            payable(validator).transfer(blockRewards);
 
-        payable(validator).transfer(blockRewards);
-
-        emit WithdrawProfit( validator,  blockRewards,  block.timestamp);
+            emit WithdrawProfit( validator,  blockRewards,  block.timestamp);
+        }
     }
 
     function viewValidatorRewards(address validator) public view returns(uint256 rewardAmount){
@@ -333,8 +337,9 @@ contract ValidatorHelper is Ownable {
             waitingBlocksForUnstake = stakedCoins;
             stakedCoins = 0;
         }
-
-        return(identity, websiteLocal, details, viewValidatorRewards(validatorAddress), stakedCoins, waitingBlocksForUnstake) ;
+        (, , , withdrawableRewards, , )  = valContract.getValidatorInfo(validatorAddress);
+        withdrawableRewards += viewValidatorRewards(validatorAddress) ;
+        return(identity, websiteLocal, details, withdrawableRewards, stakedCoins, waitingBlocksForUnstake) ;
     }
 
 
@@ -350,7 +355,8 @@ contract ValidatorHelper is Ownable {
 
 
     function totalProfitEarned(address validator) public view returns(uint256){
-        return totalProfitWithdrawn[validator] + viewValidatorRewards(validator);
+        (, , , uint256 hbincoming, , )  = valContract.getValidatorInfo(validator);
+        return totalProfitWithdrawn[validator] + hbincoming + viewValidatorRewards(validator);
     }
 
     function waitingWithdrawProfit(address user, address validatorAddress) external view returns(uint256){
@@ -398,3 +404,4 @@ contract ValidatorHelper is Ownable {
         return true;
     }
 }
+        
